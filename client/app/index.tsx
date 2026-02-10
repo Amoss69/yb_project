@@ -9,7 +9,7 @@ const Stack = createNativeStackNavigator();
 
 export default function Index() {
   // Create ONE WebSocket for the whole app
-  const webSocket = useWebSocket("10.100.102.4", 3000);
+  const webSocket = useWebSocket("10.0.2.2", 3000);
 
   return (
     <Stack.Navigator
