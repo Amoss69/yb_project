@@ -1,4 +1,4 @@
-from database import add_user
+from UsersDatabase import add_user
 
 username = input("Enter username: ")
 password = input("Enter password: ")

@@ -1,5 +1,5 @@
 from .base import NetworkEvent
-from database import get_user, add_user
+from UsersDatabase import get_user, add_user
 
 class LoginNetworkEvent(NetworkEvent):
     @staticmethod
@@ -7,11 +7,10 @@ class LoginNetworkEvent(NetworkEvent):
         return message.startswith("login|")
 
     @staticmethod
-    async def handle(client, message):
+    async def handle(client, message, clients):
         parts = message.split("|")
         username = parts[1]
         password = parts[2]
-
 
         user = get_user(username)
         if not user:
@@ -19,4 +18,11 @@ class LoginNetworkEvent(NetworkEvent):
         elif user[2] != password:
             await client.send("login|error|wrong_password")
         else:
-            await client.send("login|success")
+            await client.send("login|success|" + str(user[0]))  # user[0] = user_id
+
+            # Update the client tuple
+            for websocket, cid in list(clients):
+                if websocket == client:
+                    clients.remove((websocket, cid))
+                    clients.add((websocket, user[0]))
+

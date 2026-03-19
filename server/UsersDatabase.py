@@ -6,7 +6,7 @@ def get_connection():
     return sqlite3.connect(DB_NAME)
 
 
-def create_tables():
+def create_users_tables():
     conn = get_connection()
     cursor = conn.cursor()
 

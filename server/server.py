@@ -1,15 +1,19 @@
 import asyncio
 import websockets
-from database import create_tables
+from UsersDatabase import create_users_tables
+from MarksDataBase import create_marks_tables, reset_markers
 
 # Import all event classes from the events package
-from events import LoginNetworkEvent
+from events.LoginNetworkEvent import LoginNetworkEvent
+from events.MapMarksEvent import MapMarksEvent
 
-connected_clients = set()
+
+connected_clients = set() #Will be set of tuples - (websocket, client_id)
 
 # List of all event handlers
 network_events = [
     LoginNetworkEvent,
+    MapMarksEvent,
 ]
 
 
@@ -19,7 +23,7 @@ async def handle_message(client, message: str):
     # Find which event should handle this message
     for event in network_events:
         if event.detect(message):
-            await event.handle(client, message)
+            await event.handle(client, message, connected_clients)
             return
 
     # If no event matched
@@ -27,7 +31,7 @@ async def handle_message(client, message: str):
 
 
 async def handle_client(websocket):
-    connected_clients.add(websocket)
+    connected_clients.add((websocket,None))  # currently clients have no id, add later in login
     print("Client connected")
 
     try:
@@ -38,11 +42,15 @@ async def handle_client(websocket):
         print("Client disconnected")
 
     finally:
-        connected_clients.remove(websocket)
+        for ws, cid in list(connected_clients):
+            if ws == websocket:
+                connected_clients.remove((ws, cid))
 
 
 async def main():
-    create_tables()
+    create_users_tables()
+    reset_markers()
+    create_marks_tables()
     server = await websockets.serve(handle_client, "0.0.0.0", 3000)
     print("Server running on ws://0.0.0.0:3000")
     await server.wait_closed()

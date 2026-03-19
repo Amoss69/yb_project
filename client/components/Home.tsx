@@ -1,71 +1,122 @@
-import { Button } from "@react-navigation/elements";
-import React, { useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { Button, StyleSheet, View, BackHandler } from "react-native";
 import MapView, { Marker } from "react-native-maps";
+import { MarkerContext, UserContext } from "../context/AppContext";
 
 export default function MapScreen() {
-  const [MessageMarker,setMessageMarker] = useState("");
+  const navigation = useNavigation();
+  const user = useContext(UserContext);
+  const markerContext = useContext(MarkerContext);
+  const [markers, setMarkers] = useState([]);
+  const [selectedMarker, setSelectedMarker] = useState<string | null>(null);
+  const requestedMarkers = useRef(false);
+
+  if (!user) return null;
+  const { webSocket, userId } = user;
+
+  useEffect(() => {
+    webSocket.setOnMessage((msg) => GetMarkers(msg, setMarkers));
+
+    if (!requestedMarkers.current) {
+      requestedMarkers.current = true;
+      webSocket.sendData(`marker|get_markers|${userId}`);
+    }
+
+    return () => webSocket.setOnMessage(null);
+  }, []);
+
   return (
+    <View style={{ width: "100%", height: "100%" }}>
+      <MapView
+        style={styles.map}
+        initialRegion={{
+          latitude: 31.7683,
+          longitude: 35.2137,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        }}
+        onPress={(event) => {
+          const { latitude, longitude } = event.nativeEvent.coordinate;
+          markerContext?.setMark_latitude(latitude);
+          markerContext?.setMark_longitude(longitude);
+        }}
+      >
+        {markers.map((marker, index) => (
+          <Marker
+            key={index}
+            coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
+            image={markerImages[marker.type.toLowerCase()]}
+            title={marker.type}
+            onPress={() => {setSelectedMarker(marker.id)}
+          }
+          />
+        ))}
 
-    <View style={{
-      width: '100%',
-      height: '100%',
-    }}> 
-    
-    <MapView
-      style={styles.map}
-      initialRegion={{
-        latitude: 31.0461,
-        longitude: 34.8516,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
-      }}
-    >
-      <Marker
-        coordinate={{ latitude: 31.0461, longitude: 34.8516 }}
-        title="Marker"
-        description="This is a marker"
-      />
-    </MapView>
+        {markerContext?.Mark_latitude != null && markerContext?.Mark_longitude != null && (
+          <Marker
+            coordinate={{ latitude: markerContext.Mark_latitude, longitude: markerContext.Mark_longitude }}
+            title="Selected Location"
+          />
+        )}
+      </MapView>
+
+      <View style={{ position: "absolute", top: 30, right: 5 }}>
+        {markerContext?.Mark_latitude == null && markerContext?.Mark_longitude == null ? null : (
+          <Button title="Choose Mark" onPress={() => navigation.navigate("MarkerSelect")} />
+        )}
+      </View>
 
 
-    <Button
-    onPress={() => setMessageMarker("Choose point on mark")}
-    style={{
-      position: "absolute",
-          bottom: 30,
-          left: 20,
-          backgroundColor: "#2196F3",
-          paddingVertical: 12,
-          paddingHorizontal: 20,
-          borderRadius: 8,
-    }}
-    >
-      <Text style={{color: "white", fontWeight: "bold", fontSize: 16}}>
-        Create Marker
-      </Text>
-    </Button>
-    
+      <View style={{ position: "absolute", top: 30, left: 5 }}>
+        {selectedMarker != null && (
+        <Button
+        title="Remove Mark"
+        onPress={() => {
+        webSocket.sendData(`marker|remove|${selectedMarker}`); //sends the id of the marker to be removed to the server
+        setSelectedMarker(null);
+        }}/>
+        )}
+      </View>
 
-    <Text style={{
-      position: "absolute", 
-      bottom: 40,              
-      left: 200,             
-      fontSize: 16,
-      color: "black",
-      backgroundColor: "white",
-      padding: 4,
-      borderRadius: 4,
-    }}>{MessageMarker}</Text>
+      <View style={{ position: "absolute", bottom: 50, left: 20 }}>
+        <Button
+          title = "go back"
+          onPress={() => {requestedMarkers.current = false; navigation.navigate("Login")}} //goes back to the previous screen when the go back button is pressed
+        />
+      </View>
 
     </View>
+
+    
 
 
   );
 }
 
+function GetMarkers(data: string | null, setMarkers: React.Dispatch<React.SetStateAction<{ id: string; type: string; latitude: number; longitude: number }[]>>) {
+  if (data == null) return;
+  if (data.startsWith("place_marker|")) {
+    const parts = data.split("|");
+    const new_marker = { id: parts[1], type: parts[2], latitude: parseFloat(parts[3]), longitude: parseFloat(parts[4]) };
+    setMarkers(prev => {
+      if (prev.some(m => m.id === new_marker.id)) return prev;
+      return [...prev, new_marker];
+    });
+  } 
+  else if (data.startsWith("remove_marker|")) {
+    const markerId = data.split("|")[1];
+    setMarkers(prev => prev.filter(marker => marker.id !== markerId));
+  }
+  console.log('passed')
+}
+
+const markerImages: { [key: string]: any } = {
+  infantry: require("../assets/images/symbols/infantry.png"),
+  tank: require("../assets/images/symbols/tank.png"),
+  mechine_gunner: require("../assets/images/symbols/mechine_gunner.png"),
+};
+
 const styles = StyleSheet.create({
-  map: {
-    flex: 1,
-  },
+  map: { flex: 1 },
 });

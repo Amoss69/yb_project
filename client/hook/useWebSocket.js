@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 export default function useWebSocket(host, port) {
   const ws = useRef(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [lastMessage, setLastMessage] = useState(null);
+  const onMessageRef = useRef(null);
 
   useEffect(() => {
     const url = `ws://${host}:${port}`;
@@ -18,34 +18,29 @@ export default function useWebSocket(host, port) {
 
     ws.current.onmessage = (event) => {
       console.log("Received:", event.data);
-      setLastMessage(event.data);
+      onMessageRef.current?.(event.data);
     };
 
-    ws.current.onerror = (error) => {
-      console.log("WebSocket error:", error.message || error);
-    };
-
+    ws.current.onerror = (error) => console.log("WebSocket error:", error.message || error);
     ws.current.onclose = () => {
       console.log("WebSocket closed");
       setIsConnected(false);
     };
 
-    return () => {
-      ws.current?.close();
-    };
+    return () => ws.current?.close();
   }, [host, port]);
 
   const sendData = (data) => {
-    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+    if (ws.current?.readyState === WebSocket.OPEN) {
       ws.current.send(data);
     } else {
       console.log("WebSocket not connected");
     }
   };
 
-  return {
-    sendData,
-    isConnected,
-    lastMessage,
+  const setOnMessage = (fn) => {
+    onMessageRef.current = fn;
   };
+
+  return { sendData, isConnected, setOnMessage };
 }

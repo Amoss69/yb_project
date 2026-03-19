@@ -1,6 +1,39 @@
-import { Stack } from "expo-router";
-import React from "react";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import React, { useState } from "react";
+import Home from "../components/Home";
+import Login from "../components/login";
+import MarkerSelect from "../components/MarkerSelect";
+import { MarkerContext,UserContext } from "../context/AppContext";
+import useWebSocket from "../hook/useWebSocket";
+
+const Stack = createNativeStackNavigator();
 
 export default function RootLayout() {
-  return <Stack />;
+  const [userId, setUserId] = useState<string | null>(null);
+  const webSocket = useWebSocket("10.100.102.5", 3000);
+
+  const [Mark_latitude, setMark_latitude] = useState<number | null>(null);
+  const [Mark_longitude, setMark_longitude] = useState<number | null>(null);
+  const [ChosenMark, setChosenMark] = useState<string | null>(null);
+
+  return (
+    <MarkerContext.Provider
+      value={{ 
+        Mark_latitude,
+        setMark_latitude,
+        Mark_longitude,
+        setMark_longitude,
+        ChosenMark,
+        setChosenMark,
+      }}
+    >
+      <UserContext.Provider value={{ webSocket, userId, setUserId }}>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="MarkerSelect" component={MarkerSelect} />
+        </Stack.Navigator>
+      </UserContext.Provider>
+    </MarkerContext.Provider>
+  );
 }

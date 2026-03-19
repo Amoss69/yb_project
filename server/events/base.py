@@ -8,6 +8,6 @@ class NetworkEvent(abc.ABC):
         pass
 
     @staticmethod
-    async def handle(client, message: str):
+    async def handle(client, message: str, clients : set):
         """Handle the message."""
         pass
