@@ -15,7 +15,8 @@ def create_marks_tables():  # real used for single-precision floating-point numb
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 type TEXT,
                 latitude REAL,
-                longitude REAL
+                longitude REAL,
+                room_id INTEGER
             )
         """)
 
@@ -29,14 +30,14 @@ def reset_markers():
     conn.commit()
     conn.close()
 
-def add_marker(marker_type: str, latitude: float, longitude: float) -> int:
+def add_marker(marker_type: str, latitude: float, longitude: float, room_id: int):
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-        INSERT INTO map_markers (type, latitude, longitude)
-        VALUES (?, ?, ?)
-    """, (marker_type, latitude, longitude))
+        INSERT INTO map_markers (type, latitude, longitude, room_id)
+        VALUES (?, ?, ?, ?)
+    """, (marker_type, latitude, longitude, room_id))
 
     conn.commit()
     new_id = cursor.lastrowid
@@ -60,12 +61,10 @@ def remove_marker(marker_id: int) -> bool:
     return deleted
 
 
-def get_markers():
+def get_markers(room_id: int):  # filter by room
     conn = get_connection()
     cursor = conn.cursor()
-
-    cursor.execute("SELECT id, type, latitude, longitude FROM map_markers")
+    cursor.execute("SELECT id, type, latitude, longitude FROM map_markers WHERE room_id = ?", (room_id,))
     markers = cursor.fetchall()
-
     conn.close()
     return markers

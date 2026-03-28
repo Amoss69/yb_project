@@ -10,7 +10,8 @@ const Stack = createNativeStackNavigator();
 
 export default function RootLayout() {
   const [userId, setUserId] = useState<string | null>(null);
-  const webSocket = useWebSocket("10.100.102.5", 3000);
+  const [room_number, setRoom_number] = useState<string | null>(null);
+  const webSocket = useWebSocket("10.100.102.2", 3000);
 
   const [Mark_latitude, setMark_latitude] = useState<number | null>(null);
   const [Mark_longitude, setMark_longitude] = useState<number | null>(null);
@@ -27,7 +28,7 @@ export default function RootLayout() {
         setChosenMark,
       }}
     >
-      <UserContext.Provider value={{ webSocket, userId, setUserId }}>
+      <UserContext.Provider value={{ webSocket, userId, setUserId, room_number, setRoom_number }}>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Home" component={Home} />

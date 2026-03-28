@@ -6,12 +6,13 @@ import { UserContext } from "../context/AppContext";
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [room, setRoom] = useState("");
   const [message, setMessage] = useState("");
   const user = useContext(UserContext);
   const navigation = useNavigation();
 
   if (!user) return null;
-  const { webSocket, setUserId } = user;
+  const { webSocket, setUserId, room_number, setRoom_number } = user;
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener("hardwareBackPress", () => true); //remove the ability to go back to the previous screen (using back button on android))
@@ -22,9 +23,13 @@ export default function Login() {
     webSocket.setOnMessage((msg) => {
       if (msg.includes("login|success")) {
         setUserId(msg.split("|")[2]);
+
         navigation.navigate("Home");
-      } else if (msg.includes("login|error")) {
-        setMessage("wrong password or username");
+      } else if (msg.includes("login|error|room_error")) {
+        setMessage("Invalid room number");
+      }
+      else if (msg.includes("login|error")){
+        setMessage("Invalid username or password");
       }
     });
 
@@ -49,9 +54,23 @@ export default function Login() {
         onChangeText={(text) => setPassword(text)}
       />
 
+      <Text>Room:</Text>
+      <TextInput
+        style={{ height: 40, width: 200, borderColor: "gray", borderWidth: 1, padding: 10, margin: 10 }}
+        placeholder="Room number"
+        value={room}
+        onChangeText={(text) => {setRoom(text); setRoom_number(text)}}
+      />
+
       <Button
         title="Login"
-        onPress={() => webSocket.sendData("login|" + username + "|" + password)}
+        onPress={() => {
+          if (!username || !password || !room) {
+            setMessage("Please fill all fields");
+            return;
+          }
+          webSocket.sendData("login|" + username + "|" + password + "|" + room);
+        }}
       />
 
       <Text>{message}</Text>

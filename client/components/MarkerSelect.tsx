@@ -57,28 +57,98 @@ export default function MarkerSelect() {
   }
 
   const buttons = [
-    {
-      label: "Infantry",
-      image: require("../assets/images/symbols/infantry.png"),
-      left: 10,
-      bottom: 700,
-      onPress: () => SendChosenMarkToServer("Infantry"),
-    },
-    {
-      label: "Mechine_Gunner",
-      image: require("../assets/images/symbols/mechine_gunner.png"),
-      left: 100,
-      bottom: 700,
-      onPress: () => SendChosenMarkToServer("Mechine_Gunner"),
-    },
-    {
-      label: "Tank",
-      image: require("../assets/images/symbols/tank.png"),
-      left: 10,
-      bottom: 600,
-      onPress: () => SendChosenMarkToServer("Tank"),
-    },
-  ];
+  {
+    label: "Infantry",
+    image: require("../assets/images/symbols/infantry.png"),
+    left: 10,
+    bottom: 700,
+    onPress: () => SendChosenMarkToServer("Infantry"),
+  },
+  {
+    label: "Mechine_Gunner",
+    image: require("../assets/images/symbols/mechine_gunner.png"),
+    left: 100,
+    bottom: 700,
+    onPress: () => SendChosenMarkToServer("Mechine_Gunner"),
+  },
+  {
+    label: "Tank",
+    image: require("../assets/images/symbols/tank.png"),
+    left: 10,
+    bottom: 600,
+    onPress: () => SendChosenMarkToServer("Tank"),
+  },
+  {
+    label: "Target",
+    image: require("../assets/images/symbols/target.png"),
+    left: 100,
+    bottom: 600,
+    onPress: () => SendChosenMarkToServer("Target"),
+  },
+  {
+    label: "Armor",
+    image: require("../assets/images/symbols/armored_vehicle.png"),
+    left: 200,
+    bottom: 700,
+    onPress: () => SendChosenMarkToServer("Armor"),
+  },
+  {
+    label: "Artillery",
+    image: require("../assets/images/symbols/artillery.png"),
+    left: 200,
+    bottom: 600,
+    onPress: () => SendChosenMarkToServer("Artillery"),
+  },
+  {
+    label: "Attack_Aircraft",
+    image: require("../assets/images/symbols/attack_aircraft.png"),
+    left: 300,
+    bottom: 700,
+    onPress: () => SendChosenMarkToServer("Attack_Aircraft"),
+  },
+  {
+    label: "Drone",
+    image: require("../assets/images/symbols/drone.png"),
+    left: 300,
+    bottom: 600,
+    onPress: () => SendChosenMarkToServer("Drone"),
+  },
+  {
+    label: "Helicopter",
+    image: require("../assets/images/symbols/helicopter.png"),
+    left: 10,
+    bottom: 500,
+    onPress: () => SendChosenMarkToServer("Helicopter"),
+  },
+  {
+    label: "Mortar",
+    image: require("../assets/images/symbols/mortar.png"),
+    left: 100,
+    bottom: 500,
+    onPress: () => SendChosenMarkToServer("Mortar"),
+  },
+  {
+    label: "Outpost",
+    image: require("../assets/images/symbols/outpost.png"),
+    left: 200,
+    bottom: 500,
+    onPress: () => SendChosenMarkToServer("Outpost"),
+  },
+  {
+    label: "Ship",
+    image: require("../assets/images/symbols/ship.png"),
+    left: 300,
+    bottom: 500,
+    onPress: () => SendChosenMarkToServer("Ship"),
+  },
+  {
+    label: "Sniper",
+    image: require("../assets/images/symbols/sniper.png"),
+    left: 10,
+    bottom: 400,
+    onPress: () => SendChosenMarkToServer("Sniper"),
+  },
+];
 
   return (
     <View style={{ flex: 1 }}>

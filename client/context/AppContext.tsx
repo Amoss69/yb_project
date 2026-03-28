@@ -5,6 +5,8 @@ export const UserContext = createContext<{
   webSocket: ReturnType<typeof useWebSocket>;
   userId: string | null;
   setUserId: React.Dispatch<React.SetStateAction<string | null>>;
+  room_number: string | null;
+  setRoom_number: React.Dispatch<React.SetStateAction<string | null>>;
 } | null>(null);
 
 export const MarkerContext = createContext<{

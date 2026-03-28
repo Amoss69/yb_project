@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { Button, StyleSheet, View, BackHandler } from "react-native";
+import { Button, StyleSheet, View, BackHandler, Text } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { MarkerContext, UserContext } from "../context/AppContext";
 
@@ -61,17 +61,18 @@ export default function MapScreen() {
         )}
       </MapView>
 
-      <View style={{ position: "absolute", top: 30, right: 5 }}>
+      <View style={{ position: "absolute", bottom: 70, right: 15, padding: 5, borderRadius: 5}}>
         {markerContext?.Mark_latitude == null && markerContext?.Mark_longitude == null ? null : (
-          <Button title="Choose Mark" onPress={() => navigation.navigate("MarkerSelect")} />
+          <Button title="Choose Mark" color = "green" onPress={() => navigation.navigate("MarkerSelect")} />
         )}
       </View>
 
 
-      <View style={{ position: "absolute", top: 30, left: 5 }}>
+      <View style={{ position: "absolute", bottom: 68, left: 10 , padding: 5, borderRadius: 5}}>
         {selectedMarker != null && (
         <Button
         title="Remove Mark"
+        color="red"
         onPress={() => {
         webSocket.sendData(`marker|remove|${selectedMarker}`); //sends the id of the marker to be removed to the server
         setSelectedMarker(null);
@@ -79,16 +80,19 @@ export default function MapScreen() {
         )}
       </View>
 
-      <View style={{ position: "absolute", bottom: 50, left: 20 }}>
+      <View style={{ position: "absolute", bottom:35, left: 15}}>
         <Button
           title = "go back"
-          onPress={() => {requestedMarkers.current = false; navigation.navigate("Login")}} //goes back to the previous screen when the go back button is pressed
+          onPress={() => {webSocket.sendData('user_go_login'); requestedMarkers.current = false; navigation.navigate("Login"); }} //goes back to the previous screen when the go back button is pressed
         />
       </View>
+      
+      <Text style={{ position: "absolute", bottom: 40, right: 20, backgroundColor: "white", padding: 5, borderRadius: 5, borderColor: "grey", borderWidth: 1 }}>
+        Room number: {user.room_number}
+      </Text>
 
-    </View>
 
-    
+      </View>
 
 
   );
@@ -115,6 +119,16 @@ const markerImages: { [key: string]: any } = {
   infantry: require("../assets/images/symbols/infantry.png"),
   tank: require("../assets/images/symbols/tank.png"),
   mechine_gunner: require("../assets/images/symbols/mechine_gunner.png"),
+  target: require("../assets/images/symbols/target.png"),
+  armor: require("../assets/images/symbols/armored_vehicle.png"),
+  artillery: require("../assets/images/symbols/artillery.png"),
+  attack_aircraft: require("../assets/images/symbols/attack_aircraft.png"),
+  drone: require("../assets/images/symbols/drone.png"),
+  helicopter: require("../assets/images/symbols/helicopter.png"),
+  mortar: require("../assets/images/symbols/mortar.png"),
+  outpost: require("../assets/images/symbols/outpost.png"),
+  ship: require("../assets/images/symbols/ship.png"),
+  sniper: require("../assets/images/symbols/sniper.png"),
 };
 
 const styles = StyleSheet.create({
