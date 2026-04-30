@@ -6,7 +6,7 @@ export default function useWebSocket(host, port) {
   const onMessageRef = useRef(null);
 
   useEffect(() => {
-    const url = `ws://${host}:${port}`;
+    const url = `ws://${host}:${port}`; //wss for tls
     console.log("Connecting to:", url);
 
     ws.current = new WebSocket(url);
@@ -36,7 +36,7 @@ export default function useWebSocket(host, port) {
     } else {
       console.log("WebSocket not connected");
     }
-  };
+  };;
 
   const setOnMessage = (fn) => {
     onMessageRef.current = fn;

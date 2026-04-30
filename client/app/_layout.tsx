@@ -11,7 +11,7 @@ const Stack = createNativeStackNavigator();
 export default function RootLayout() {
   const [userId, setUserId] = useState<string | null>(null);
   const [room_number, setRoom_number] = useState<string | null>(null);
-  const webSocket = useWebSocket("10.100.102.2", 3000);
+  const webSocket = useWebSocket("10.100.102.14", 3000);
 
   const [Mark_latitude, setMark_latitude] = useState<number | null>(null);
   const [Mark_longitude, setMark_longitude] = useState<number | null>(null);
