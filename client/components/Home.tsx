@@ -129,6 +129,19 @@ const markerImages: { [key: string]: any } = {
   outpost: require("../assets/images/symbols/outpost.png"),
   ship: require("../assets/images/symbols/ship.png"),
   sniper: require("../assets/images/symbols/sniper.png"),
+
+  friendly_infantry: require("../assets/images/symbols/friendly_infantry.png"),
+  friendly_tank: require("../assets/images/symbols/friendly_tank.png"),
+  friendly_mechine_gunner: require("../assets/images/symbols/friendly_mechine_gunner.png"),
+  friendly_armor: require("../assets/images/symbols/friendly_armored_vehicle.png"),
+  friendly_artillery: require("../assets/images/symbols/friendly_artillery.png"),
+  friendly_attack_aircraft: require("../assets/images/symbols/friendly_attack_aircraft.png"),
+  friendly_drone: require("../assets/images/symbols/friendly_drone.png"),
+  friendly_helicopter: require("../assets/images/symbols/friendly_helicopter.png"),
+  friendly_mortar: require("../assets/images/symbols/friendly_mortar.png"),
+  friendly_outpost: require("../assets/images/symbols/friendly_outpost.png"),
+  friendly_ship: require("../assets/images/symbols/friendly_ship.png"),
+  friendly_sniper: require("../assets/images/symbols/friendly_sniper.png"),
 };
 
 const styles = StyleSheet.create({
