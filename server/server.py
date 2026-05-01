@@ -1,7 +1,7 @@
 from custom_websocket import CustomWebSocketServer
 import threading
 import sys
-
+from logger import log
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QLineEdit, QPushButton, QTextEdit, QGroupBox
@@ -27,6 +27,7 @@ network_events = [
 ]
 
 
+
 def handle_message(client, message: str):
     if message == "user_go_login":
         for ws, cid, rid in list(connected_clients):
@@ -46,6 +47,10 @@ def handle_message(client, message: str):
 
 
 def handle_client(websocket):
+
+    client = str(websocket.raw_socket.getpeername())
+    log("SYSTEM", client, "CONNECTED")
+
     connected_clients.add((websocket, None, None))
     bridge.clients_changed.emit()
 
@@ -58,6 +63,8 @@ def handle_client(websocket):
     except Exception as e:
         pass
     finally:
+        log("SYSTEM", client, "DISCONNECTED")
+
         for ws, cid, rid in list(connected_clients):
             if ws == websocket:
                 connected_clients.remove((ws, cid, rid))
@@ -65,12 +72,15 @@ def handle_client(websocket):
 
 
 def run_server():
+
+    log("SYSTEM", "SERVER", "STARTED")
+
     create_users_tables()
     create_marks_tables()
     reset_markers()
     CustomWebSocketServer("0.0.0.0", 3000, handle_client).start_websocket()
 
-
+    log("SYSTEM", "SERVER", "STOPPED")
 
 class ServerWindow(QWidget):
     def __init__(self):

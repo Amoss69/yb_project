@@ -4,7 +4,6 @@ import base64
 import hashlib
 import threading
 
-from sympy import false
 
 from WebSocketWrapper import CustomWebSocket
 
