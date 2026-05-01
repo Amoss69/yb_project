@@ -1,6 +1,6 @@
 from datetime import datetime
 
-ShowLogger = False
+ShowLogger = True
 
 LOG_FILE = "server.log"
 

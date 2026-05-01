@@ -19,3 +19,4 @@ class CustomWebSocket:
             client = str(self.raw_socket.getpeername())
             log("IN", client, message)
         return message
+

@@ -183,6 +183,8 @@ class CustomWebSocketServer:
         frame.extend(data)
         client.send(bytes(frame))
 
+
+
     def send_pong(self, client, payload: bytes):
         frame = bytearray([0b10001010, len(payload)]) + bytearray(payload)
         client.send(bytes(frame))
@@ -195,6 +197,16 @@ class CustomWebSocketServer:
                 return None
             buf.extend(chunk)
         return buf
+
+    def send_close(self, client):
+        #Send a WebSocket close frame before closing
+        try:
+            close_frame = bytes([0b10001000, 0])  # FIN + close opcode, no payload
+            client.send(close_frame)
+        except OSError:
+            pass  # if connection already gone, it's ok
+
+
 
 
 

@@ -1,5 +1,5 @@
 from .base import NetworkEvent
-from UsersDatabase import get_user, add_user
+from UsersDatabase import get_user, hash_password
 
 class LoginNetworkEvent(NetworkEvent):
     @staticmethod
@@ -15,14 +15,19 @@ class LoginNetworkEvent(NetworkEvent):
 
         user = get_user(username)
         if not user:
-             client.send("login|error|no_user")
-        elif user[2] != password:
-             client.send("login|error|wrong_password")
+            client.send("login|error|no_user")
+            return
+
+        salt = user[3]
+        _, hashed = hash_password(password, salt)
+
+        if hashed != user[2]:
+            client.send("login|error|wrong_password")
         elif room_id < 1 or room_id > 10:
-             client.send("login|error|room_error")
+            client.send("login|error|room_error")
         else:
-             client.send("login|success|" + str(user[0]))  # user[0] = user_id
-             for websocket, cid, rid in list(clients): # Update the client tuple
+            client.send("login|success|" + str(user[0]))
+            for websocket, cid, rid in list(clients):
                 if websocket == client:
                     clients.remove((websocket, cid, rid))
                     clients.add((websocket, user[0], room_id))

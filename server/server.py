@@ -1,4 +1,4 @@
-from custom_websocket import CustomWebSocketServer
+from custom_websocket_server import CustomWebSocketServer
 import threading
 import sys
 from logger import log
@@ -63,7 +63,9 @@ def handle_client(websocket):
     except Exception as e:
         pass
     finally:
+        websocket.server.send_close(websocket.raw_socket) #close connection
         log("SYSTEM", client, "DISCONNECTED")
+
 
         for ws, cid, rid in list(connected_clients):
             if ws == websocket:
@@ -78,7 +80,7 @@ def run_server():
     create_users_tables()
     create_marks_tables()
     reset_markers()
-    CustomWebSocketServer("0.0.0.0", 3000, handle_client).start_websocket()
+    CustomWebSocketServer("0.0.0.0", 3000, handle_client).start_websocket() #main loop of the server, from here every client gets to handle client with thread
 
     log("SYSTEM", "SERVER", "STOPPED")
 

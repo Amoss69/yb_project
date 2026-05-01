@@ -52,6 +52,7 @@ export default function Login() {
         placeholder="Enter Password here"
         value={password}
         onChangeText={(text) => setPassword(text)}
+        secureTextEntry={true}
       />
 
       <Text>Room:</Text>
@@ -78,6 +79,7 @@ export default function Login() {
       <View style={{ position: "absolute", bottom: 50, left: 20 }}>
         <Button
           title = "exit"
+
           onPress={() => BackHandler.exitApp()} //exits the app when the exit button is pressed
         />
       </View>
