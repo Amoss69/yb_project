@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 export default function useWebSocket(host, port) {
   const ws = useRef(null);
   const [isConnected, setIsConnected] = useState(false);
-  const onMessageRef = useRef(null);
+  const onMessageRef = useRef(null); // ref so handlers set by screens don't trigger re-renders
 
   useEffect(() => {
     const url = `ws://${host}:${port}`; //wss for tls
@@ -18,7 +18,7 @@ export default function useWebSocket(host, port) {
 
     ws.current.onmessage = (event) => {
       console.log("Received:", event.data);
-      onMessageRef.current?.(event.data);
+      onMessageRef.current?.(event.data);  // forward to whichever screen is currently listening
     };
 
     ws.current.onerror = (error) => console.log("WebSocket error:", error.message || error);
@@ -27,7 +27,7 @@ export default function useWebSocket(host, port) {
       setIsConnected(false);
     };
 
-    return () => ws.current?.close();
+    return () => ws.current?.close();  // cleanup on unmount or if host/port changes (wont really happen)
   }, [host, port]);
 
   const sendData = (data) => {
@@ -39,7 +39,7 @@ export default function useWebSocket(host, port) {
   };;
 
   const setOnMessage = (fn) => {
-    onMessageRef.current = fn;
+    onMessageRef.current = fn; // screens call this to register their own message handler
   };
 
   return { sendData, isConnected, setOnMessage };

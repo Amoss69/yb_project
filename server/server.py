@@ -89,10 +89,10 @@ class ServerWindow(QWidget):
         super().__init__()
         self.setWindowTitle("Server")
         self.setMinimumSize(400, 500)
-        self._build_ui()
-        bridge.clients_changed.connect(self.refresh_clients)
+        self.build_ui()
+        bridge.clients_changed.connect(self.refresh_clients) # update UI when clients connect/disconnect
 
-    def _build_ui(self):
+    def build_ui(self):
         layout = QVBoxLayout(self)
 
         # --- Add User section ---
@@ -106,11 +106,11 @@ class ServerWindow(QWidget):
 
         self.password_input = QLineEdit()
         self.password_input.setPlaceholderText("Password")
-        self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
+        self.password_input.setEchoMode(QLineEdit.EchoMode.Password) # hide password while typing
         user_layout.addWidget(QLabel("Password:"))
         user_layout.addWidget(self.password_input)
 
-        self.feedback_label = QLabel("")
+        self.feedback_label = QLabel("") # shows success/error messages
         user_layout.addWidget(self.feedback_label)
 
         add_btn = QPushButton("Add User")
@@ -145,7 +145,7 @@ class ServerWindow(QWidget):
     def refresh_clients(self):
         rooms = {}
         pending = 0
-
+        # sort clients into rooms, track anyone not logged in yet
         for ws, cid, rid in connected_clients:
             if rid is None:
                 pending += 1
@@ -170,7 +170,7 @@ class ServerWindow(QWidget):
 
 
 if __name__ == "__main__":
-    server_thread = threading.Thread(target=run_server, daemon=True)
+    server_thread = threading.Thread(target=run_server, daemon=True) # daemon=True so it dies with the main process
     server_thread.start()
 
     app = QApplication(sys.argv)

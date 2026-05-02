@@ -10,7 +10,8 @@ export default function MapScreen() {
   const markerContext = useContext(MarkerContext);
   const [markers, setMarkers] = useState([]);
   const [selectedMarker, setSelectedMarker] = useState<string | null>(null);
-  const requestedMarkers = useRef(false);
+  const requestedMarkers = useRef(false); // prevents double-fetching on re-render
+
 
   if (!user) return null;
   const { webSocket, userId } = user;
@@ -20,10 +21,10 @@ export default function MapScreen() {
 
     if (!requestedMarkers.current) {
       requestedMarkers.current = true;
-      webSocket.sendData(`marker|get_markers|${userId}`);
+      webSocket.sendData(`marker|get_markers|${userId}`); // ask server for all markers in this room
     }
 
-    return () => webSocket.setOnMessage(null);
+    return () => webSocket.setOnMessage(null); // cleanup so old handler doesn't interfere when navigating back to this screen later
   }, []);
 
   return (
@@ -37,6 +38,7 @@ export default function MapScreen() {
           longitudeDelta: 0.05,
         }}
         onPress={(event) => {
+          // tapping the map sets a staging location before the user picks a marker type
           const { latitude, longitude } = event.nativeEvent.coordinate;
           markerContext?.setMark_latitude(latitude);
           markerContext?.setMark_longitude(longitude);
@@ -48,15 +50,15 @@ export default function MapScreen() {
             coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
             image={markerImages[marker.type.toLowerCase()]}
             title={marker.type}
-            onPress={() => {setSelectedMarker(marker.id)}
+            onPress={() => {setSelectedMarker(marker.id)}  // selecting a marker enables the remove button
           }
           />
         ))}
-
+        
         {markerContext?.Mark_latitude != null && markerContext?.Mark_longitude != null && (
           <Marker
             coordinate={{ latitude: markerContext.Mark_latitude, longitude: markerContext.Mark_longitude }}
-            title="Selected Location"
+            title="Selected Location" // preview pin shown before the user confirms a marker type 
           />
         )}
       </MapView>
@@ -82,7 +84,7 @@ export default function MapScreen() {
 
       <View style={{ position: "absolute", bottom:35, left: 15}}>
         <Button
-          title = "go back"
+          title = "go back"  // reset  rquestedMarkers so markers are re-fetched on next login
           onPress={() => {webSocket.sendData('user_go_login'); requestedMarkers.current = false; navigation.navigate("Login"); }} //goes back to the previous screen when the go back button is pressed
         />
       </View>
@@ -104,7 +106,7 @@ function GetMarkers(data: string | null, setMarkers: React.Dispatch<React.SetSta
     const parts = data.split("|");
     const new_marker = { id: parts[1], type: parts[2], latitude: parseFloat(parts[3]), longitude: parseFloat(parts[4]) };
     setMarkers(prev => {
-      if (prev.some(m => m.id === new_marker.id)) return prev;
+      if (prev.some(m => m.id === new_marker.id)) return prev; // ignore if we already have it
       return [...prev, new_marker];
     });
   } 

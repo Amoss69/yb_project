@@ -50,6 +50,7 @@ export default function MarkerSelect() {
     const payload = `marker|place|${label}|${lat}|${lng}`;
     webSocket.sendData(payload);
 
+    // clear the staging coords so the preview pin disappears
     markerContext.setMark_latitude(null);
     markerContext.setMark_longitude(null);
 
@@ -100,7 +101,7 @@ export default function MarkerSelect() {
 
   
 ];
-
+ //each button is absolutely positioned on a grid — left sets the column, bottom sets the row 
   return (
     <View style={{ flex: 1 }}>
       {buttons.map((button, index) => (

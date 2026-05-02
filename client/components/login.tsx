@@ -15,6 +15,7 @@ export default function Login() {
   const { webSocket, setUserId, room_number, setRoom_number } = user;
 
   useEffect(() => {
+    // disable android back button so users can't go back to a previous session
     const backHandler = BackHandler.addEventListener("hardwareBackPress", () => true); //remove the ability to go back to the previous screen (using back button on android))
     return () => backHandler.remove();
   }, []);
@@ -60,7 +61,7 @@ export default function Login() {
         style={{ height: 40, width: 200, borderColor: "gray", borderWidth: 1, padding: 10, margin: 10 }}
         placeholder="Room number"
         value={room}
-        onChangeText={(text) => {setRoom(text); setRoom_number(text)}}
+        onChangeText={(text) => {setRoom(text); setRoom_number(text)}} // keep both local and context in sync
       />
 
       <Button

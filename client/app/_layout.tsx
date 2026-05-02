@@ -13,11 +13,13 @@ export default function RootLayout() {
   const [room_number, setRoom_number] = useState<string | null>(null);
   const webSocket = useWebSocket("10.100.102.14", 3000);
 
+    // staging coords for a marker before the user picks its type
   const [Mark_latitude, setMark_latitude] = useState<number | null>(null);
   const [Mark_longitude, setMark_longitude] = useState<number | null>(null);
   const [ChosenMark, setChosenMark] = useState<string | null>(null);
 
   return (
+        // two separate contexts — one for the map marker state, one for the user/socket session
     <MarkerContext.Provider
       value={{ 
         Mark_latitude,

@@ -15,7 +15,7 @@ class CustomWebSocket:
     def receive(self):
 
         message = self.server.receive_message(self.raw_socket)
-        if message:
+        if message: # don't log if None (disconnected)
             client = str(self.raw_socket.getpeername())
             log("IN", client, message)
         return message

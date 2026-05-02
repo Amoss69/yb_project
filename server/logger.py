@@ -7,6 +7,7 @@ LOG_FILE = "server.log"
 def log(direction, client, message):
     time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+    #long messages so the log stays readable
     short_msg = message[:100]
     if len(message) > 100:
         short_msg += "..."

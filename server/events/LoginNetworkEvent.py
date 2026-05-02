@@ -19,7 +19,7 @@ class LoginNetworkEvent(NetworkEvent):
             return
 
         salt = user[3]
-        _, hashed = hash_password(password, salt)
+        _, hashed = hash_password(password, salt) # rehash with the stored salt to compare
 
         if hashed != user[2]:
             client.send("login|error|wrong_password")
@@ -27,6 +27,7 @@ class LoginNetworkEvent(NetworkEvent):
             client.send("login|error|room_error")
         else:
             client.send("login|success|" + str(user[0]))
+            # replace the client's entry with their actual user id and room
             for websocket, cid, rid in list(clients):
                 if websocket == client:
                     clients.remove((websocket, cid, rid))

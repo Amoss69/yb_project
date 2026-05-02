@@ -22,8 +22,8 @@ class CustomWebSocketServer:
         self.lock = threading.Lock()
 
     def start_websocket(self):
-        #context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-        #context.load_cert_chain(certfile="cert.pem", keyfile="key.pem")
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        context.load_cert_chain(certfile="cert.pem", keyfile="key.pem")
 
         server = socket.socket()
         server.bind((self.host, self.port))
@@ -35,13 +35,13 @@ class CustomWebSocketServer:
             print(f"New connection from {addr}")
 
 
-            #client = context.wrap_socket(raw_client, server_side=True)
+            client = context.wrap_socket(raw_client, server_side=True)
 
             handshake = self.receive_and_send_handshake(raw_client)
             if not handshake:
                 continue #if handshake didn't work skip the client
 
-            websocket = CustomWebSocket(raw_client, self)
+            websocket = CustomWebSocket(client, self)
 
             with self.lock:
                 self.clients.append(websocket)
@@ -69,7 +69,7 @@ class CustomWebSocketServer:
 
             if key is None:
                 raise Exception("No WebSocket key found in handshake")
-
+            # standard websocket handshake: combine key + magic string, sha1 it, base64 encode
             magic_string = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
             accept_key = base64.b64encode(
                 hashlib.sha1((key + magic_string).encode()).digest()
@@ -115,7 +115,7 @@ class CustomWebSocketServer:
 
 
             elif opcode == PING_OPCODE:
-
+                # keeps the connection alive with pings, we have to pong back
                 ping_len = second_byte & 0b01111111
                 ping_data = self.recv_exact(client, 4 + ping_len)  # 4 mask bytes + payload
                 mask = ping_data[:4]
@@ -152,7 +152,7 @@ class CustomWebSocketServer:
             payload = self.recv_exact(client , real_length)
 
 
-            # decode this frame
+            # client-to-server frames are always masked — XOR each byte with the mask to decode
             decoded = bytearray()
             for i in range(len(payload)):
                 decoded.append(payload[i] ^ mask[i % 4])
@@ -190,6 +190,7 @@ class CustomWebSocketServer:
         client.send(bytes(frame))
 
     def recv_exact(self, client, n):
+        # socket.recv isn't guaranteed to return exactly n bytes, so loop until have them all
         buf = bytearray()
         while len(buf) < n:
             chunk = client.recv(n - len(buf))
@@ -204,7 +205,7 @@ class CustomWebSocketServer:
             close_frame = bytes([0b10001000, 0])  # FIN + close opcode, no payload
             client.send(close_frame)
         except OSError:
-            pass  # if connection already gone, it's ok
+            pass  # connection already gone, nothing to do
 
 
 

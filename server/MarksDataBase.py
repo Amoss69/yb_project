@@ -26,7 +26,7 @@ def create_marks_tables():  # real used for single-precision floating-point numb
 def reset_markers():
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM map_markers")  # remove all rows
+    cursor.execute("DELETE FROM map_markers")  # wipes all markers across all rooms
     conn.commit()
     conn.close()
 
@@ -40,7 +40,7 @@ def add_marker(marker_type: str, latitude: float, longitude: float, room_id: int
     """, (marker_type, latitude, longitude, room_id))
 
     conn.commit()
-    new_id = cursor.lastrowid
+    new_id = cursor.lastrowid # sqlite gives us the id it just assigned
     conn.close()
     return new_id  # return the auto-generated ID
 
@@ -48,12 +48,12 @@ def add_marker(marker_type: str, latitude: float, longitude: float, room_id: int
 
 
 def remove_marker(marker_id: int) -> bool:
-    """Remove a marker by ID. Returns True if a row was deleted, False if not found."""
+    #Remove a marker by ID. Returns True if a row was deleted, False if not found.
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("DELETE FROM map_markers WHERE id = ?", (marker_id,))
-    deleted = cursor.rowcount > 0
+    deleted = cursor.rowcount > 0 # rowcount 0 means no row matched that id
 
     conn.commit()
     conn.close()
@@ -67,4 +67,4 @@ def get_markers(room_id: int):  # filter by room
     cursor.execute("SELECT id, type, latitude, longitude FROM map_markers WHERE room_id = ?", (room_id,))
     markers = cursor.fetchall()
     conn.close()
-    return markers
+    return markers # list of (id, type, lat, lng) tuples

@@ -10,7 +10,7 @@ class MapMarksEvent(NetworkEvent):
 
     @staticmethod
     def handle(client, message: str, clients: set):
-        # find this client's room_id
+        # find which room this client is in
         room_id = None
         for ws, cid, rid in clients:
             if ws == client:
@@ -30,7 +30,7 @@ class MapMarksEvent(NetworkEvent):
             MapMarksEvent.broadcast(clients, room_id, f"remove_marker|{marker_id}")
 
         elif command == "get_markers":
-            MapMarksEvent.sync_markers(client, room_id)
+            MapMarksEvent.sync_markers(client, room_id) # called when a client first joins a room
 
     @staticmethod
     def broadcast(clients: set, room_id: int, message: str):
@@ -40,12 +40,12 @@ class MapMarksEvent(NetworkEvent):
                 try:
                     ws.send(message)  # blocking send
                 except:
-                    pass
+                    pass # client probably disconnected mid-send
 
     @staticmethod
     def sync_markers(websocket, room_id: int):
-        """Send all existing markers in the room to a newly connected client."""
-        from MarksDataBase import get_markers
+        #Send all existing markers in the room to a newly connected client.
+        from MarksDataBase import get_markers # imported here to avoid circular imports
         for marker in get_markers(room_id):
             marker_id, marker_type, lat, lng = marker
             websocket.send(f"place_marker|{marker_id}|{marker_type}|{lat}|{lng}")
