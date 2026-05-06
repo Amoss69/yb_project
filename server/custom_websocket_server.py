@@ -37,7 +37,7 @@ class CustomWebSocketServer:
 
             client = context.wrap_socket(raw_client, server_side=True)
 
-            handshake = self.receive_and_send_handshake(raw_client)
+            handshake = self.receive_and_send_handshake(client)
             if not handshake:
                 continue #if handshake didn't work skip the client
 
